@@ -7,7 +7,7 @@ const MAX_TIME = 10000;
 
 async function getapis() {
     try {
-        const response = await axios.get('https://raw.githubusercontent.com/wakame02/wktopu/refs/heads/main/inv.json');
+        const response = await axios.get('https://raw.githubusercontent.com/toka-kun/Education/refs/heads/main/apis/Invidious/yes.json');
         apis = await response.data;
         console.log('データを取得しました:', apis);
     } catch (error) {
@@ -18,7 +18,7 @@ async function getapis() {
 
 async function getapisgit() {
     try {
-        const response = await axios.get('https://raw.githubusercontent.com/wakame02/wktopu/refs/heads/main/inv.json');
+        const response = await axios.get('https://raw.githubusercontent.com/toka-kun/Education/refs/heads/main/apis/Invidious/yes.json');
         apis = await response.data;
         console.log('データを取得しました:', apis);
     } catch (error) {
@@ -65,18 +65,25 @@ async function getYouTube (videoId) {
     const formatStreams = videoInfo.formatStreams || [];
     let streamUrl = formatStreams.reverse().map(stream => stream.url)[0];
     const audioStreams = videoInfo.adaptiveFormats || [];
+    
+    // 【修正箇所】webmだけでなくmp4も許可するように変更
     let highstreamUrl = audioStreams
-      .filter(stream => stream.container === 'webm' && stream.resolution === '1080p')
+      .filter(stream => (stream.container === 'webm' || stream.container === 'mp4') && stream.resolution === '1080p')
       .map(stream => stream.url)[0];
+      
     const audioUrl = audioStreams
       .filter(stream => stream.container === 'm4a' && stream.audioQuality === 'AUDIO_QUALITY_MEDIUM')
       .map(stream => stream.url)[0];
+      
+    // 【修正箇所】webmだけでなくmp4も許可し、container(形式)の情報も追加
     const streamUrls = audioStreams
-      .filter(stream => stream.container === 'webm' && stream.resolution)
+      .filter(stream => (stream.container === 'webm' || stream.container === 'mp4') && stream.resolution)
       .map(stream => ({
         url: stream.url,
         resolution: stream.resolution,
+        container: stream.container // ← これがあるとmp4かwebmか判別しやすいです
       }));
+      
       if (videoInfo.hlsUrl) {
         streamUrl = `/wkt/live/s/${videoId}`;
       }
